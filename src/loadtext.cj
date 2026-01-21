@@ -1,20 +1,10 @@
 macro package dataloader
 
-import std.ast.*
-import std.collection.*
-import std.env.*
-import std.fs.*
+import std.ast.{diagReport, DiagReportLevel, Token, Tokens, TokenKind, ToTokens}
+import std.collection.last
 
 private func loadText(filePath: String): String {
-    if (exists(filePath) == true) {
-        return String.fromUtf8(File.readFrom(filePath))
-    }
-    let currentDir = getWorkingDirectory()
-    let fullPath = currentDir.join(filePath)
-    if (exists(fullPath) == true) {
-        return String.fromUtf8(File.readFrom(fullPath))
-    }
-    throw FSException("File not found: ${filePath}\nCurrent directory: ${currentDir}")
+    String.fromUtf8(loadBytes(filePath))
 }
 
 public macro LoadText(attrTokens: Tokens, inputTokens: Tokens) {

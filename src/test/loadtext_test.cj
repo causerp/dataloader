@@ -1,7 +1,8 @@
 package dataloader.test
 
-import dataloader.*
-import std.unittest.*
+import dataloader.LoadText
+
+// cjlint-ignore -start !G.NAM.04 function names should be lower camel case
 
 @Test
 class TestLoadText {
@@ -34,3 +35,5 @@ class TestLoadText {
         @Expect(constText, expectedText)
     }
 }
+
+// cjlint-ignore -end function names should be lower camel case

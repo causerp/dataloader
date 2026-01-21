@@ -1,7 +1,8 @@
 package dataloader.test
 
-import dataloader.*
-import std.unittest.*
+import dataloader.LoadBytes
+
+// cjlint-ignore -start !G.NAM.04 function names should be lower camel case
 
 @Test
 class TestLoadBytes {
@@ -36,3 +37,5 @@ class TestLoadBytes {
         @Expect(staticBytes, expectedBytes)
     }
 }
+
+// cjlint-ignore -end function names should be lower camel case

@@ -1,14 +1,27 @@
 macro package dataloader
 
-import std.ast.*
-import std.collection.*
-import std.fs.*
+import std.ast.{diagReport, DiagReportLevel, Token, Tokens, TokenKind, ToTokens}
+import std.collection.last
+import std.env.getWorkingDirectory
+import std.fs.{exists, File, FSException}
 
-private func loadBytes(filePath: String): Array<Byte> {
-    try {
+/**
+ * Loads bytes from file. If the file doesn't exist, it tries to load it from the current working directory.
+ *
+ * @param filePath file path.
+ *
+ * @throws FSException when file not found.
+ */
+func loadBytes(filePath: String): Array<Byte> {
+    if (exists(filePath) == true) {
         return File.readFrom(filePath)
-    } catch (_: Exception) {}
-    return Array<Byte>()
+    }
+    let currentDir = getWorkingDirectory()
+    let fullPath = currentDir.join(filePath)
+    if (exists(fullPath) == true) {
+        return File.readFrom(fullPath)
+    }
+    throw FSException("File not found: ${filePath}\nCurrent directory: ${currentDir}")
 }
 
 public macro LoadBytes(attrTokens: Tokens, inputTokens: Tokens) {
