@@ -3,10 +3,41 @@ macro package dataloader
 import std.ast.{diagReport, DiagReportLevel, Token, Tokens, TokenKind, ToTokens}
 import std.collection.last
 
+/**
+ * @brief Loads the content of a text file at compile time.
+ *
+ * Reads the file specified in the input tokens and embeds its content
+ * as a string literal in the generated code.
+ *
+ * @param filePath The path to the file to load.
+ *
+ * @return The content of the file as a string.
+ */
 private func loadText(filePath: String): String {
     String.fromUtf8(loadBytes(filePath))
 }
 
+/**
+ * @brief Macro to load a text file and assign it to a variable.
+ *
+ * This macro generates a variable declaration initialized with the
+ * content of the specified text file. It supports various declaration
+ * formats provided in the attribute tokens.
+ *
+ * Example:
+ * ```
+ * // Simple usage (infers 'let')
+ * @LoadText[myStringVar]("path/to/file.txt")
+ *
+ * // With visibility or mutability
+ * @LoadText[public let myStringVar]("path/to/file.txt")
+ * ```
+ *
+ * @param attrTokens Tokens representing the variable declaration (e.g., `public let varName`).
+ * @param inputTokens Tokens containing the file path string literal.
+ *
+ * @return Tokens representing the variable declaration initialized with the file content.
+ */
 public macro LoadText(attrTokens: Tokens, inputTokens: Tokens) {
     var ret = quote()
     if (attrTokens.size == 1) {

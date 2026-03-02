@@ -6,7 +6,7 @@ import std.env.getWorkingDirectory
 import std.fs.{exists, File, FSException}
 
 /**
- * Loads bytes from file. If the file doesn't exist, it tries to load it from the current working directory.
+ * @brief Loads bytes from file. If the file doesn't exist, it tries to load it from the current working directory.
  *
  * @param filePath file path.
  *
@@ -24,6 +24,27 @@ func loadBytes(filePath: String): Array<Byte> {
     throw FSException("File not found: ${filePath}\nCurrent directory: ${currentDir}")
 }
 
+/**
+ * @brief Macro to load a binary file and assign it to a variable.
+ *
+ * This macro generates a variable declaration initialized with the
+ * byte content of the specified file. It handles file path resolution
+ * relative to the source or working directory.
+ *
+ * Example:
+ * ```
+ * // Simple usage (infers 'let' and type Array<Byte>)
+ * @LoadBytes[myDataVar]("path/to/file.bin")
+ *
+ * // With visibility
+ * @LoadBytes[public let myDataVar]("path/to/file.bin")
+ * ```
+ *
+ * @param attrTokens Tokens representing the variable declaration.
+ * @param inputTokens Tokens containing the file path string literal.
+ *
+ * @return Tokens representing the variable declaration initialized with the file bytes.
+ */
 public macro LoadBytes(attrTokens: Tokens, inputTokens: Tokens) {
     var ret = quote()
     if (attrTokens.size == 1) {
