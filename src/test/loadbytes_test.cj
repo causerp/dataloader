@@ -6,7 +6,7 @@ import dataloader.LoadBytes
 
 @Test
 class TestLoadBytes {
-    private static let staticBytes: Array<Byte> = @LoadBytes("test_data/file2.bin")
+    private static let TEST_DATA: Array<Byte> = @LoadBytes("test_data/file2.bin")
 
     let expectedBytes: Array<Byte> = [0x00, 0x01, 0x02, 0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xFE, 0xFF]
 
@@ -34,7 +34,7 @@ class TestLoadBytes {
 
     @TestCase
     func loadBytes_as_private_static() {
-        @Expect(staticBytes, expectedBytes)
+        @Expect(TEST_DATA, expectedBytes)
     }
 
     @TestCase

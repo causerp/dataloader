@@ -6,7 +6,7 @@ import dataloader.LoadText
 
 @Test
 class TestLoadText {
-    private static const constText = @LoadText("test_data/file1.txt")
+    private static const TEST_DATA = @LoadText("test_data/file1.txt")
 
     let expectedText = "\n this is a \"string\"!\nthis text is in a new line\n"
 
@@ -32,7 +32,7 @@ class TestLoadText {
 
     @TestCase
     func loadText_as_private_static_const() {
-        @Expect(constText, expectedText)
+        @Expect(TEST_DATA, expectedText)
     }
 }
 
