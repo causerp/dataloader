@@ -1,7 +1,6 @@
 macro package dataloader
 
-import std.ast.{diagReport, DiagReportLevel, Token, Tokens, TokenKind, ToTokens}
-import std.collection.last
+import std.ast.{diagReport, DiagReportLevel, Token, Tokens, TokenKind}
 
 /**
  * @brief Loads the content of a text file at compile time.
@@ -27,45 +26,26 @@ private func loadText(filePath: String): String {
  * Example:
  * ```
  * // Simple usage (infers 'let')
- * @LoadText[myStringVar]("path/to/file.txt")
+ * const myStringVar = @LoadText("path/to/file.txt")
  *
  * // With visibility or mutability
- * @LoadText[public let myStringVar]("path/to/file.txt")
+ * public var myStringVar = @LoadText("path/to/file.txt")
  * ```
  *
- * @param attrTokens Tokens representing the variable declaration (e.g., `public let varName`).
  * @param inputTokens Tokens containing the file path string literal.
  *
  * @return Tokens representing the variable declaration initialized with the file content.
  */
-public macro LoadText(attrTokens: Tokens, inputTokens: Tokens) {
-    var ret = quote()
-    if (attrTokens.size == 1) {
-        match (attrTokens[0].kind) {
-            case IDENTIFIER => ret.append(quote(let $(attrTokens[0]) =))
-            case _ => ()
-        }
-    } else {
-        for (token in attrTokens) {
-            ret.append(token)
-        }
-        if (let Some(token) <- (attrTokens |> last)) {
-            match (token.kind) {
-                case ASSIGN => ()
-                case _ => ret.append(Token(ASSIGN))
-            }
-        }
-    }
+public macro LoadText(inputTokens: Tokens) {
     if (inputTokens.size != 1) {
-        diagReport(DiagReportLevel.ERROR, inputTokens, "more than 1 file path found",
-            "Example: loadText[public let](\"file.txt\")")
+        diagReport(DiagReportLevel.ERROR, inputTokens, "more than 1 file path found", "Example: loadText(\"file.txt\")")
     }
     let token = inputTokens[0]
-    match (token.kind) {
-        case STRING_LITERAL | MULTILINE_STRING | MULTILINE_RAW_STRING => ret.append(
-            Token(MULTILINE_STRING, loadText(token.value)))
-        case _ => diagReport(DiagReportLevel.ERROR, inputTokens, "invalid file path",
-            "Example: loadText[public let](\"file.txt\")")
+    return match (token.kind) {
+        case STRING_LITERAL | MULTILINE_STRING | MULTILINE_RAW_STRING => Token(MULTILINE_STRING, loadText(token.value))
+            .toTokens()
+        case _ =>
+            diagReport(DiagReportLevel.ERROR, inputTokens, "invalid file path", "Example: loadText(\"file.txt\")")
+            quote()
     }
-    return ret
 }

@@ -1,7 +1,6 @@
 macro package dataloader
 
 import std.ast.{diagReport, DiagReportLevel, Token, Tokens, TokenKind, ToTokens}
-import std.collection.last
 import std.env.getWorkingDirectory
 import std.fs.{exists, File, FSException}
 
@@ -34,44 +33,25 @@ func loadBytes(filePath: String): Array<Byte> {
  * Example:
  * ```
  * // Simple usage (infers 'let' and type Array<Byte>)
- * @LoadBytes[myDataVar]("path/to/file.bin")
+ * let myDataVar: Array<Byte> = @LoadBytes("path/to/file.bin")
  *
  * // With visibility
- * @LoadBytes[public let myDataVar]("path/to/file.bin")
+ * public var myDataVar: Array<Byte> = @LoadBytes("path/to/file.bin")
  * ```
  *
- * @param attrTokens Tokens representing the variable declaration.
  * @param inputTokens Tokens containing the file path string literal.
  *
- * @return Tokens representing the variable declaration initialized with the file bytes.
+ * @return Token with the file bytes.
  */
-public macro LoadBytes(attrTokens: Tokens, inputTokens: Tokens) {
-    var ret = quote()
-    if (attrTokens.size == 1) {
-        match (attrTokens[0].kind) {
-            case IDENTIFIER => ret.append(quote(let $(attrTokens[0]): Array<Byte> =))
-            case _ => ()
-        }
-    } else {
-        for (token in attrTokens) {
-            ret.append(token)
-        }
-        if (let Some(token) <- (attrTokens |> last)) {
-            match (token.kind) {
-                case ASSIGN => ()
-                case _ => ret.append(quote(: Array<Byte> =))
-            }
-        }
-    }
+public macro LoadBytes(inputTokens: Tokens) {
     if (inputTokens.size != 1) {
-        diagReport(DiagReportLevel.ERROR, inputTokens, "more than 1 file path found",
-            "Example: LoadBytes[public let](\"file.bin\")")
+        diagReport(DiagReportLevel.ERROR, inputTokens, "more than 1 file path found", "Example: LoadBytes(\"file.bin\")")
     }
     let token = inputTokens[0]
-    match (token.kind) {
-        case STRING_LITERAL | MULTILINE_STRING | MULTILINE_RAW_STRING => ret.append(quote($(loadBytes(token.value))))
-        case _ => diagReport(DiagReportLevel.ERROR, inputTokens, "invalid file path",
-            "Example: LoadBytes[public let](\"file.bin\")")
+    return match (token.kind) {
+        case STRING_LITERAL | MULTILINE_STRING | MULTILINE_RAW_STRING => quote($(loadBytes(token.value)))
+        case _ =>
+            diagReport(DiagReportLevel.ERROR, inputTokens, "invalid file path", "Example: LoadBytes(\"file.bin\")")
+            quote()
     }
-    return ret
 }

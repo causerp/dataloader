@@ -6,19 +6,19 @@ import dataloader.LoadText
 
 @Test
 class TestLoadText {
-    @LoadText[private static const constText]("test_data/file1.txt")
+    private static const constText = @LoadText("test_data/file1.txt")
 
     let expectedText = "\n this is a \"string\"!\nthis text is in a new line\n"
 
     @TestCase
     func loadText() {
-        @LoadText[text]("test_data/file1.txt")
+        let text = @LoadText("test_data/file1.txt")
         @Expect(text, expectedText)
     }
 
     @TestCase
     func loadText_as_var() {
-        @LoadText[var text]("test_data/file1.txt")
+        var text = @LoadText("test_data/file1.txt")
 
         var str = expectedText
 
